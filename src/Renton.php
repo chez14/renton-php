@@ -58,7 +58,7 @@ class Renton {
     public function get_list_jadwal(){
         return $this->jadwal_list;
     }
-
+/*
     public function add_jadwal(){
 
     }
@@ -66,7 +66,7 @@ class Renton {
     public function remove_jadwal($mkid){
 
     }
-
+*/
     private function intepret_jadwal(){
         $html=file_get_contents($this->html_location);
         $jadwals=[];
