@@ -1,0 +1,24 @@
+{
+    "name": "onlyongunz/renton-php",
+    "description": "Jadwal Student Portal to JSON Object",
+    "type": "library",
+    "homepage": "https://github.com/onlyongunz/Renton-php/",
+    "keywords": [
+        "unpar",
+        "student portal"
+    ],
+    "authors": [
+        {
+            "name": "Gunawan Christianto",
+            "email": "gunawan.mr.blue@gmail.com",
+            "role": "owner"
+        }
+    ],
+    "minimum-stability": "beta",
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "Onlyongunz\\": "src/"
+        }
+    }
+}

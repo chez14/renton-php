@@ -1,0 +1,6 @@
+# ini folder proccessing, makannya kita ignore.
+target/
+/vendor/
+
+# for production purposes only
+composer.lock
