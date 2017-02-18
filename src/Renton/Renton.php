@@ -50,11 +50,36 @@ class Renton {
             ]
         ];
 
+    /**
+     * Method ini akan membaca html dan memparsing html tersebut
+     * dan merepresentasikan menjadi sebuah objek yang bermakna.
+     * 
+     * @param $htmlfile Lokasi ke file html
+     */
     public function parse_html($htmlfile) {
         $this->html_location=$htmlfile;
         $this->intepret_jadwal();
     }
 
+    /**
+     * Method ini akan membaca html dan memparsing html tersebut
+     * dan merepresentasikan menjadi sebuah objek yang bermakna.
+     * 
+     * @param $html isi dari html tersebut
+     */
+    public function parse_html_data($html) {
+        $this->intepret_jadwal($html);
+    }
+
+    /**
+     * Merender data menjadi file JSON / string JSON.
+     * data json akan mengandung 3 data penting:
+     * identitas, detil_jadwal, dan kelas.
+     * 
+     * @param $json_path lokasi untuk file JSON yang akan ditulis
+     * @param $json_options opsi JSON, siapa tau anda perlu.
+     * @return JSON String (jika $json_path null) atau int dari penulis file 
+     */
     public function toJSON($json_path = null, $json_options = null) {
         $objek = [
             "identitas"=>$this->identitas,
@@ -67,13 +92,26 @@ class Renton {
         return file_put_contents($json_path, json_encode($objek, $json_options));
     }
 
+    /**
+     * Melempar listing jadwal kita
+     *
+     * @return jadwal list
+     */
     public function get_list_jadwal() {
         return $this->jadwal_list;
     }
 
-    private function intepret_jadwal() {
-        $html=file_get_contents($this->html_location);
-
+    /**
+     * memulai parsing htmlnya, kita lakukan secara bertahap
+     * 
+     * @param $html isi dari html, autoload jika null
+     */
+    private function intepret_jadwal($html=null) {
+        // Autoload html jika null
+        if($html==null)
+            $html=file_get_contents($this->html_location);
+        
+        //parsing jadwal kelas
         $jadwal_asli = $this->jadwal_split($html)[2][0];
         $jadwals=[];
         preg_match_all(
@@ -86,6 +124,7 @@ class Renton {
         $ruby = Model\Kelas::parseRombongan($jadwals[3]);
         $this->jadwal_list = $ruby;
 
+        // parsing identitas pemilik
         $identitas=[];
         preg_match_all(
             self::JADWAL_PATTERN['identitas']['pattern'],
@@ -98,14 +137,23 @@ class Renton {
         $identity->parse(array_splice($identitas[0], 2, 3));
         $this->identitas=$identity;
 
+        //parsing detil jadwal
         $detil_jadwal = new Model\JadwalMeta();
         $detil_jadwal->parse($html);
         $this->detil_jadwal = $detil_jadwal;
     }
+
+    /**
+     * Memilih table jadwal yang akan di parsing.
+     * Ini dibuat karena ternyata pattern mendeteksi juga benda lain selain dari jadwal
+     * kelas.
+     *
+     * @param $htmls isi file html yang akan kita cari tablenya
+     * @return array of table
+     */
     private function jadwal_split($htmls){
         $result=[];
         preg_match_all(self::JADWAL_PATTERN['splitter']['pattern'], $htmls, $result, PREG_SET_ORDER);
-        //var_dump($result);
         return $result;
     }
 }

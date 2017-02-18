@@ -1,15 +1,21 @@
 <?php
 namespace Onlyongunz\Renton\Model;
 
+use Onlyongunz\Renton\Helper\Cleaner;
+
+
+/**
+ * Kelas Identitas merepresentasikan pemilik dari jadwal ini.
+ * anda dapat mengekstrak email, nama, fakultas, bahkan npm untuk jadwal
+ * ini.
+ *
+ * @author     Onlyongunz <gunawan.mr.blue@gmail.com>
+ */
 class Identitas {
 
-    public $nama,
-        $npm,
-        $email,
-        $fakultas,
-        $program_studi,
-        $bidang_peminatan;
-    
+    const
+        IDENTITY_PATTERN="/(\<td([\w\s\=\"\%]{0,})\>)((.|\n)*?)(<\/td>)/i";
+
     protected $mapping = [
             "NPM"=>"npm",
             "Fakultas"=>"fakultas",
@@ -18,13 +24,32 @@ class Identitas {
             "Email"=>"email",
             "Bidang Peminatan"=>"bidang_peminatan"
         ];
-
-    const
-        IDENTITY_PATTERN="/(\<td([\w\s\=\"\%]{0,})\>)((.|\n)*?)(<\/td>)/i";
     
+    public $nama,
+        $npm,
+        $email,
+        $fakultas,
+        $program_studi,
+        $bidang_peminatan;
+    
+    /**
+     * @param $object massukan objek yang sudah pernah ada sebelumnya
+     */
     public function __cosntruct($object = null) {
+        if($object!=null) {
+            $buffer = array_intersect_key($object, array_flip([
+                'npm', 'nama', 'email', 'bidang_peminatan', 'fakultas', 'program_studi'
+            ]));
+            foreach($buffer as $key=>$isi)
+                $this->{$key}=$isi;
+        }
     }
 
+    /**
+     * Parsing langsung dari halaman student portal.
+     * 
+     * @param $html full isi file html yag akan di parsing
+     */
     public function parse($html) {
         $total_identitas = array_map(function ($data) {
             $temp = [];
@@ -34,16 +59,9 @@ class Identitas {
         foreach ($total_identitas as $d) {
             for ($i=0; $i<count($d); $i+=3) {
                 if (array_key_exists(trim($d[$i]), $this->mapping)) {
-                    $this->{$this->mapping[trim($d[$i])]}=$this->cleanup($d[$i+2]);
+                    $this->{$this->mapping[trim($d[$i])]}=Cleaner::cleanup($d[$i+2]);
                 }
             }
         }
-    }
-
-    private function cleanup($data) {
-        $data = html_entity_decode(strip_tags($data));
-        $data = preg_replace('/[^A-Za-z0-9\@\.]/', ' ', $data);
-        $data = preg_replace('/ +/', ' ', $data);
-        return trim($data);
     }
 }

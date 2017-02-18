@@ -3,12 +3,13 @@ namespace Onlyongunz\Renton\Model;
 
 use Onlyongunz\Renton\Helper\Cleaner;
 
+/**
+ * Kelas ini menyimpan informasi tentang si jadwal,
+ * tanggal update, jadwal semester genap/ganjil, dan kode jadwal tersebut.
+ *
+ * @author     Onlyongunz <gunawan.mr.blue@gmail.com>
+ */
 class JadwalMeta {
-
-    public $kode_jadwal,
-        $jadwal_tahun = "2016-2017",
-        $semester = "GENAP",
-        $update;
     
     const
         PATTERNS = [
@@ -17,6 +18,29 @@ class JadwalMeta {
             "update"=>"/(Cetak \: (([0-9]{1,2}) ([a-zA-Z]{3,4}) ([0-9]{4}) ([0-9]{2}\:[0-9]{2})))/i"
         ];
 
+    public $kode_jadwal,
+        $jadwal_tahun = "2016-2017",
+        $semester = "GENAP",
+        $update;
+
+    /**
+     * @param $object massukan objek yang sudah pernah ada sebelumnya
+     */
+    public function __construct($object=null) {
+        if($object!=null) {
+            $buffer = array_intersect_key($object, array_flip([
+                'jadwal_tahun', 'semester', 'update'
+            ]));
+            foreach($buffer as $key=>$isi)
+                $this->{$key}=$isi;
+        }
+    }
+
+    /**
+     * Parsing langsung dari halaman student portal.
+     * 
+     * @param $html full isi file html yag akan di parsing
+     */
     public function parse($html) {
         //get kode_jadwal.
         $jadwals = [];
