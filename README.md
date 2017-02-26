@@ -25,4 +25,9 @@ require("vendor/autoload.php");
 
 Dokumentasi akan segera menyusul. Sementara contoh penggunaan ada di folder `example`.
 
+## Current ToDos
+ - Split the parser, as i working for [CAS--](https://github.com/ftis-admin/cas-min-min-php).
+ - Make documentation.
+ - Make theme-able image generator.
+
 Bon Appétit.
